@@ -42,9 +42,12 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Grant gradlew permission
+        run: chmod +x ${{env.ANDROID_APP_PATH}}/gradlew
+
       # Build the debug apk
       - name: Build debug apk
-        run: gradle assembleDebug -p ${{env.ANDROID_APP_PATH}}
+        run: ./${{env.ANDROID_APP_PATH}}/gradlew assembleDebug -p ${{env.ANDROID_APP_PATH}}
 
       # Upload the debug apk to GitHub
       - name: Upload debug apk
