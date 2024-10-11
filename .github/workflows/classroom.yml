@@ -21,8 +21,8 @@ env:
   README_PATH: "."
 
 jobs:
-  check-android-project:
-    name: Check Android Project
+  check-android-project-exist:
+    name: Check Android Project (Exist)
     runs-on: ubuntu-latest
     if: github.actor != 'github-classroom[bot]'
     steps:
@@ -30,26 +30,39 @@ jobs:
       - uses: actions/checkout@v4
 
       # Check if the application folder contains an Android project
-      - name: Check for Android project
+      - name: Check for Android project (Exist)
         run: |
           if [ -f "${{env.ANDROID_APP_PATH}}/build.gradle" ] || [ -f "${{env.ANDROID_APP_PATH}}/build.gradle.kts" ]; then
               echo "Android project found"
-              if [ -n "$(find ${{env.ANDROID_APP_PATH}}/app/src/main/java -name "*.kt" -type f)" ]; then
-                  echo "Module app is written in Kotlin"
-                  exit 1
-              else
-                  echo "Module app is written in Java"
-              fi
           else
               echo "No Android project found"
               exit 1
           fi
 
+  check-android-project-java:
+    name: Check Android Project (Java)
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    needs: [check-android-project-exist]
+    steps:
+      #Get the code
+      - uses: actions/checkout@v4
+
+      # Check if the application folder contains an Android project
+      - name: Check for Android project (Java)
+        run: |
+            if [ -n "$(find ${{env.ANDROID_APP_PATH}}/app/src/main/java -name "*.kt" -type f)" ]; then
+                echo "Module app is written in Kotlin"
+                exit 1
+            else
+                echo "Module app is written in Java"
+            fi
+
   run-autograding-tests:
     name: Autograding
     runs-on: ubuntu-latest
     if: github.actor != 'github-classroom[bot]'
-    needs: [check-android-project]
+    needs: [check-android-project-java]
     steps:
       # Get the code
       - uses: actions/checkout@v4
@@ -102,9 +115,9 @@ jobs:
         with:
           test-name: Build Debug
           setup-command: ""
-          command: ". ./setenv.sh && ./$ANDROID_APP_PATH/gradlew :app:assembleDebug --stacktrace --scan -p $ANDROID_APP_PATH"
+          command: ". ./setenv.sh && ./$ANDROID_APP_PATH/gradlew :app:assembleDebug --stacktrace -p $ANDROID_APP_PATH"
           timeout: 5
-          max-score: 1
+          max-score: 5
 
       - name: Q1
         id: q1
