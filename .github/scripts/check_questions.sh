@@ -58,7 +58,6 @@ check_question() {
 
   echo "###########################"
   echo -e "Question: $question_nbr \n$question_text"
-  echo -e "\nCorrect answer(s): $correct_answer_pattern" #just for demo
   echo -e "\nStudent response(s):\n$student_q_response"
   echo -e "\nScore: $score"
   echo "###########################"
